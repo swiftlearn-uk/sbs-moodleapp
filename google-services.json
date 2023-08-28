@@ -1,42 +1,36 @@
 {
   "project_info": {
-    "project_number": "",
-    "firebase_url": "",
-    "project_id": "",
-    "storage_bucket": ""
+    "project_number": "735659895460",
+    "project_id": "sbs-ilearn-69388",
+    "storage_bucket": "sbs-ilearn-69388.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:111111111111:android:1111111111111111",
+        "mobilesdk_app_id": "1:735659895460:android:3d38e58e03d3bd400dd431",
         "android_client_info": {
-          "package_name": "com.moodle.moodlemobile"
+          "package_name": "edu.sbs.ilearnapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "",
+          "client_id": "735659895460-9a20in2tvvaptu4jcenml7rbcsald1vl.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": ""
-        },
-        {
-          "current_key": ""
+          "current_key": "AIzaSyA8zBkWUnvALO0AOLRZBqUgZ5w2KSQGLi4"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "735659895460-9a20in2tvvaptu4jcenml7rbcsald1vl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

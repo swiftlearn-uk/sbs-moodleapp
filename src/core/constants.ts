@@ -146,6 +146,8 @@ export class CoreConstants {
     static readonly CONFIG = { ...envJson.config } as unknown as EnvironmentConfig; // Data parsed from config.json files.
     static readonly BUILD = envJson.build as unknown as EnvironmentBuild; // Build info.
 
+    // static siteurl = 'https://ilearn.sbs.edu';
+
     /**
      * Check whether devtools should be enabled.
      *

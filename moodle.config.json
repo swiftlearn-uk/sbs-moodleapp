@@ -1,6 +1,6 @@
 {
-    "app_id": "com.moodle.moodlemobile",
-    "appname": "Moodle Mobile",
+    "app_id": "edu.sbs.ilearnapp",
+    "appname": "SBS iLearn",
     "versioncode": 43000,
     "versionname": "4.3.0",
     "cache_update_frequency_usually": 420000,
@@ -67,18 +67,15 @@
         "zh-tw": "正體中文"
     },
     "wsservice": "moodle_mobile_app",
-    "demo_sites": {
-        "student": {
-            "url": "https://school.moodledemo.net",
-            "username": "student",
-            "password": "moodle"
-        },
-        "teacher": {
-            "url": "https://school.moodledemo.net",
-            "username": "teacher",
-            "password": "moodle"
+    "siteurl": "https://ilearn.sbs.edu",
+    "sites": [
+        {
+            "name": "SBS iLearn",
+            "alias": "SBS iLearn",
+            "url": "https://ilearn.sbs.edu",
+            "staging": false
         }
-    },
+    ],
     "defaultZoomLevel": "none",
     "zoomlevels": {
         "none": 100,
@@ -86,21 +83,20 @@
         "high": 120
     },
     "customurlscheme": "moodlemobile",
-    "sites": [],
     "multisitesdisplay": "",
     "sitefindersettings": {},
     "onlyallowlistedsites": false,
     "skipssoconfirmation": false,
     "forcedefaultlanguage": false,
-    "privacypolicy": "https://moodle.net/moodle-app-privacy/",
-    "notificoncolor": "#f98012",
+    "privacypolicy": "https://www.sbs.edu/privacy-policy",
+    "notificoncolor": "#0a4797",
     "enableanalytics": false,
     "enableonboarding": true,
     "forceColorScheme": "",
     "forceLoginLogo": false,
     "ioswebviewscheme": "moodleappfs",
     "appstores": {
-        "android": "com.moodle.moodlemobile",
+        "android": "edu.sbs.ilearnapp",
         "ios": "id633359593"
     },
     "wsrequestqueuelimit": 10,

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "google-services.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1692825066128,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1692825066128,
+            "name": "Commit-0",
+            "content": "{\n  \"project_info\": {\n    \"project_number\": \"735659895460\",\n    \"project_id\": \"sbs-ilearn-69388\",\n    \"storage_bucket\": \"sbs-ilearn-69388.appspot.com\"\n  },\n  \"client\": [\n    {\n      \"client_info\": {\n        \"mobilesdk_app_id\": \"1:735659895460:android:3d38e58e03d3bd400dd431\",\n        \"android_client_info\": {\n          \"package_name\": \"edu.sbs.ilearnapp\"\n        }\n      },\n      \"oauth_client\": [\n        {\n          \"client_id\": \"735659895460-9a20in2tvvaptu4jcenml7rbcsald1vl.apps.googleusercontent.com\",\n          \"client_type\": 3\n        }\n      ],\n      \"api_key\": [\n        {\n          \"current_key\": \"AIzaSyA8zBkWUnvALO0AOLRZBqUgZ5w2KSQGLi4\"\n        }\n      ],\n      \"services\": {\n        \"appinvite_service\": {\n          \"other_platform_oauth_client\": [\n            {\n              \"client_id\": \"735659895460-9a20in2tvvaptu4jcenml7rbcsald1vl.apps.googleusercontent.com\",\n              \"client_type\": 3\n            }\n          ]\n        }\n      }\n    }\n  ],\n  \"configuration_version\": \"1\"\n}\n"
+        }
+    ]
+}
