@@ -21,13 +21,13 @@ import {
     CoreCourseSection,
     CoreCourseHelper,
 } from '@features/course/services/course-helper';
-import { CoreCourse, CoreCourseModuleCompletionStatus, CoreCourseModuleCompletionTracking } from '@features/course/services/course';
-import { CoreCourseModuleDelegate, CoreCourseModuleHandlerButton } from '@features/course/services/module-delegate';
+import { CoreCourse } from '@features/course/services/course';
+import { CoreCourseModuleDelegate } from '@features/course/services/module-delegate';
 import {
     CoreCourseModulePrefetchDelegate,
     CoreCourseModulePrefetchHandler,
 } from '@features/course/services/module-prefetch-delegate';
-import { CoreConstants } from '@/core/constants';
+import { CoreConstants, DownloadStatus } from '@/core/constants';
 import { CoreEventObserver, CoreEvents } from '@singletons/events';
 import { BehaviorSubject } from 'rxjs';
 
@@ -50,17 +50,22 @@ export class CoreCourseModuleComponent implements OnInit, OnDestroy {
     @Input() showActivityDates = false; // Whether to show activity dates.
     @Input() showCompletionConditions = false; // Whether to show activity completion conditions.
     @Input() showLegacyCompletion?: boolean; // Whether to show module completion in the old format.
+    @Input() showCompletion = true; // Whether to show module completion.
+    @Input() showAvailability = true; // Whether to show module availability.
+    @Input() showExtra = true; // Whether to show extra badges.
+    @Input() showDownloadStatus = true; // Whether to show download status.
+    @Input() showIndentation = true; // Whether to show indentation
     @Input() isLastViewed = false; // Whether it's the last module viewed in a course.
     @Output() completionChanged = new EventEmitter<CoreCourseModuleCompletionData>(); // Notify when module completion changes.
     @HostBinding('class.indented') indented = false;
 
     modNameTranslated = '';
-    hasInfo = false;
+    hasCompletion = false; // Whether activity has completion to be shown.
     showManualCompletion = false; // Whether to show manual completion when completion conditions are disabled.
     prefetchStatusIcon$ = new BehaviorSubject<string>(''); // Module prefetch status icon.
     prefetchStatusText$ = new BehaviorSubject<string>(''); // Module prefetch status text.
-    autoCompletionTodo = false;
     moduleHasView = true;
+    activityInline = false;
 
     protected prefetchHandler?: CoreCourseModulePrefetchHandler;
 
@@ -71,14 +76,24 @@ export class CoreCourseModuleComponent implements OnInit, OnDestroy {
      */
     async ngOnInit(): Promise<void> {
         const site = CoreSites.getRequiredCurrentSite();
-        const enableIndentation = await CoreCourse.isCourseIndentationEnabled(site, this.module.course);
 
-        this.indented = enableIndentation && this.module.indent > 0;
+        if (this.showIndentation && this.module.indent > 0) {
+            this.indented = await CoreCourse.isCourseIndentationEnabled(site, this.module.course);
+        } else {
+            this.indented = false;
+        }
         this.modNameTranslated = CoreCourse.translateModuleName(this.module.modname, this.module.modplural);
-        this.showLegacyCompletion = this.showLegacyCompletion ??
-            CoreConstants.CONFIG.uselegacycompletion ??
-            !site.isVersionGreaterEqualThan('3.11');
-        this.checkShowManualCompletion();
+        if (this.showCompletion) {
+            this.showLegacyCompletion = this.showLegacyCompletion ??
+                CoreConstants.CONFIG.uselegacycompletion ??
+                !site.isVersionGreaterEqualThan('3.11');
+            this.checkShowCompletion();
+        } else {
+            this.showLegacyCompletion = false;
+            this.showCompletionConditions = false;
+            this.showManualCompletion = false;
+            this.hasCompletion = false;
+        }
 
         if (!this.module.handlerData) {
             return;
@@ -87,23 +102,20 @@ export class CoreCourseModuleComponent implements OnInit, OnDestroy {
         this.module.handlerData.a11yTitle = this.module.handlerData.a11yTitle ?? this.module.handlerData.title;
         this.moduleHasView = CoreCourse.moduleHasView(this.module);
 
-        const completionStatus = this.showCompletionConditions && this.module.completiondata?.isautomatic &&
-            this.module.completiondata.tracking == CoreCourseModuleCompletionTracking.COMPLETION_TRACKING_AUTOMATIC
-            ? this.module.completiondata.state
-            : undefined;
+        if (
+            this.module.handlerData.hasCustomCmListItem &&
+            (!this.showAvailability || !this.module.availabilityinfo) &&
+            (!this.showCompletion || !this.hasCompletion) &&
+            (!this.showActivityDates || !this.module.dates?.length) &&
+            !this.module.groupmode &&
+            !(this.module.visible === 0) &&
+            !(this.module.visible !== 0 && this.module.isStealth)
+        ) {
+            this.activityInline = true;
+        }
 
-        this.autoCompletionTodo = completionStatus == CoreCourseModuleCompletionStatus.COMPLETION_INCOMPLETE ||
-            completionStatus == CoreCourseModuleCompletionStatus.COMPLETION_COMPLETE_FAIL;
-
-        this.hasInfo = !!(
-            this.module.description ||
-            (this.showActivityDates && this.module.dates && this.module.dates.length) ||
-            (this.autoCompletionTodo && !this.showLegacyCompletion) ||
-            (this.module.availabilityinfo)
-        );
-
-        if (this.module.handlerData?.showDownloadButton) {
-            const status = await CoreCourseModulePrefetchDelegate.getModuleStatus(this.module, this.module.course);
+        if (this.showDownloadStatus && this.module.handlerData.showDownloadButton) {
+            const status = await CoreCourseModulePrefetchDelegate.getDownloadedModuleStatus(this.module, this.module.course);
             this.updateModuleStatus(status);
 
             // Listen for changes on this module status, even if download isn't enabled.
@@ -132,19 +144,19 @@ export class CoreCourseModuleComponent implements OnInit, OnDestroy {
     /**
      * Show module status.
      *
-     * @param prefetchstatus Module status.
+     * @param prefetchStatus Module status.
      */
-    protected updateModuleStatus(prefetchstatus: string): void {
-        if (!prefetchstatus) {
+    protected updateModuleStatus(prefetchStatus: DownloadStatus | null): void {
+        if (!prefetchStatus) {
             return;
         }
 
-        switch (prefetchstatus) {
-            case CoreConstants.OUTDATED:
+        switch (prefetchStatus) {
+            case DownloadStatus.OUTDATED:
                 this.prefetchStatusIcon$.next(CoreConstants.ICON_OUTDATED);
                 this.prefetchStatusText$.next('core.outdated');
                 break;
-            case CoreConstants.DOWNLOADED:
+            case DownloadStatus.DOWNLOADED:
                 this.prefetchStatusIcon$.next(CoreConstants.ICON_DOWNLOADED);
                 this.prefetchStatusText$.next('core.downloaded');
                 break;
@@ -154,15 +166,20 @@ export class CoreCourseModuleComponent implements OnInit, OnDestroy {
                 break;
         }
 
-        this.module.handlerData?.updateStatus?.(prefetchstatus);
+        this.module.handlerData?.updateStatus?.(prefetchStatus);
     }
 
     /**
      * Check whether manual completion should be shown.
      */
-    protected async checkShowManualCompletion(): Promise<void> {
+    protected async checkShowCompletion(): Promise<void> {
         this.showManualCompletion = this.showCompletionConditions ||
             await CoreCourseModuleDelegate.manualCompletionAlwaysShown(this.module);
+
+        this.hasCompletion = !!this.module.completiondata && this.module.uservisible &&
+            (!this.module.completiondata.isautomatic || (this.module.completiondata.details?.length || 0) > 0) &&
+            (this.showCompletionConditions || this.showManualCompletion);
+
     }
 
     /**
@@ -180,9 +197,10 @@ export class CoreCourseModuleComponent implements OnInit, OnDestroy {
      * Function called when a button is clicked.
      *
      * @param event Click event.
-     * @param button The clicked button.
      */
-    buttonClicked(event: Event, button: CoreCourseModuleHandlerButton): void {
+    buttonClicked(event: Event): void {
+        // eslint-disable-next-line deprecation/deprecation
+        const button = this.module.handlerData?.button ?? this.module.handlerData?.buttons?.[0];
         if (!button || !button.action) {
             return;
         }

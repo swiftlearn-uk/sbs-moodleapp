@@ -270,7 +270,7 @@ export class AddonModLessonHelperProvider {
             if (option.checked || multiChoiceQuestion.multi) {
                 // Add the control.
                 const value = multiChoiceQuestion.multi ?
-                    { value: option.checked, disabled: option.disabled } : option.value;
+                    { value: option.checked, disabled: option.disabled } : option.checked;
                 questionForm.addControl(option.name, this.formBuilder.control(value));
                 controlAdded = true;
             }
@@ -369,7 +369,7 @@ export class AddonModLessonHelperProvider {
             };
 
             // Init the control.
-            essayQuestion.control = this.formBuilder.control('');
+            essayQuestion.control = this.formBuilder.control('', { nonNullable: true });
             questionForm.addControl(essayQuestion.textarea.name, essayQuestion.control);
         }
 
@@ -461,25 +461,28 @@ export class AddonModLessonHelperProvider {
         const element = CoreDomUtils.convertToElement(html);
 
         // Check if it has a checkbox.
-        let input = <HTMLInputElement> element.querySelector('input[type="checkbox"][name*="answer"]');
+        let input = element.querySelector<HTMLInputElement>('input[type="checkbox"][name*="answer"]');
         if (input) {
             // Truefalse or multichoice.
+            const successBadge = element.querySelector<HTMLElement>('.badge.badge-success');
             const data: AddonModLessonCheckboxAnswerData = {
                 isCheckbox: true,
                 checked: !!input.checked,
                 name: input.name,
                 highlight: !!element.querySelector('.highlight'),
                 content: '',
+                successBadge: successBadge?.innerText,
             };
 
             input.remove();
+            successBadge?.remove();
             data.content = element.innerHTML.trim();
 
             return data;
         }
 
         // Check if it has an input text or number.
-        input = <HTMLInputElement> element.querySelector('input[type="number"],input[type="text"]');
+        input = element.querySelector<HTMLInputElement>('input[type="number"],input[type="text"]');
         if (input) {
             // Short answer or numeric.
             return {
@@ -632,7 +635,7 @@ export type AddonModLessonInputQuestion = AddonModLessonQuestionBasicData & {
 export type AddonModLessonEssayQuestion = AddonModLessonQuestionBasicData & {
     useranswer?: string; // User answer, for reviewing.
     textarea?: AddonModLessonTextareaData; // Data for the textarea.
-    control?: FormControl; // Form control.
+    control?: FormControl<string>; // Form control.
 };
 
 /**
@@ -700,6 +703,7 @@ export type AddonModLessonCheckboxAnswerData = {
     name: string;
     highlight: boolean;
     content: string;
+    successBadge?: string;
 };
 
 /**

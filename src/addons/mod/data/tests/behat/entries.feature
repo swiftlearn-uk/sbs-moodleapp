@@ -1,30 +1,31 @@
-@mod @mod_data @app @javascript
+@addon_mod_data @app @javascript
 Feature: Users can manage entries in database activities
   In order to populate databases
   As a user
   I need to add and manage entries to databases
 
   Background:
-    Given the following "users" exist:
-    | username | firstname | lastname | email |
-    | student1 | Student | 1 | student1@example.com |
-    | student2 | Student | 2 | student2@example.com |
-    | teacher1 | Teacher | 1 | teacher1@example.com |
+    Given the Moodle site is compatible with this feature
+    And the following "users" exist:
+      | username | firstname | lastname | email |
+      | student1 | Student | 1 | student1@example.com |
+      | student2 | Student | 2 | student2@example.com |
+      | teacher1 | Teacher | 1 | teacher1@example.com |
     And the following "courses" exist:
-    | fullname | shortname | category |
-    | Course 1 | C1 | 0 |
+      | fullname | shortname | category |
+      | Course 1 | C1 | 0 |
     And the following "course enrolments" exist:
-    | user | course | role |
-    | teacher1 | C1 | editingteacher |
-    | student1 | C1 | student |
-    | student2 | C1 | student |
+      | user | course | role |
+      | teacher1 | C1 | editingteacher |
+      | student1 | C1 | student |
+      | student2 | C1 | student |
     And the following "activities" exist:
-    | activity | name      | intro        | course | idnumber |
-    | data     | Web links | Useful links | C1     | data1    |
+      | activity | name      | intro        | course | idnumber | comments |
+      | data     | Web links | Useful links | C1     | data1    | 0        |
     And the following "mod_data > fields" exist:
-    | database | type | name        | description      |
-    | data1    | text | URL         | URL link         |
-    | data1    | text | Description | Link description |
+      | database | type | name        | description      |
+      | data1    | text | URL         | URL link         |
+      | data1    | text | Description | Link description |
 
   Scenario: Create entry
     Given I entered the data activity "Web links" on course "Course 1" as "student1" in the app
@@ -38,7 +39,13 @@ Feature: Users can manage entries in database activities
     And I should find "Moodle community site" in the app
 
   Scenario: Browse entry
-    Given I entered the data activity "Web links" on course "Course 1" as "student1" in the app
+    Given the following "activities" exist:
+      | activity | name               | intro | course | idnumber | comments |
+      | data     | Data with comments | -     | C1     | data2    | 1        |
+    And the following "mod_data > fields" exist:
+      | database | type | name        | description |
+      | data2    | text | Description | Description |
+    And I entered the data activity "Web links" on course "Course 1" as "student1" in the app
 
     # TODO Create and use a generator for database entries.
     When I press "Add entries" in the app
@@ -54,6 +61,7 @@ Feature: Users can manage entries in database activities
     And I press "Save" near "Web links" in the app
     And I press "Show more" near "Moodle community site" in the app
     Then I should find "Moodle community site" in the app
+    And I should not find "Comments" in the app
     And I should be able to press "Previous" in the app
     But I should not be able to press "Next" in the app
 
@@ -69,6 +77,25 @@ Feature: Users can manage entries in database activities
     When I press the back button in the app
     And I should find "Moodle community site" in the app
     And I should find "Moodle Cloud" in the app
+
+    Given I entered the data activity "Data with comments" on course "Course 1" as "student1" in the app
+    When I press "Add entries" in the app
+    And I set the following fields to these values in the app:
+      | Description | Moodle community site |
+    And I press "Save" near "Data with comments" in the app
+    And I press "Show more" near "Moodle community site" in the app
+    Then I should find "Moodle community site" in the app
+    And I should find "Comments" in the app
+
+    Given the following config values are set as admin:
+      | usecomments | 0 |
+    And I entered the data activity "Data with comments" on course "Course 1" as "student1" in the app
+    When I press "Show more" near "Moodle community site" in the app
+    Then I should not find "Comments" in the app
+    But the following events should have been logged for "student1" in the app:
+      | name                                 | activity | activityname       | course   |
+      | \mod_data\event\course_module_viewed | data     | Data with comments | Course 1 |
+      | \mod_data\event\record_created       | data     | Data with comments | Course 1 |
 
   Scenario: Students can not edit or delete other user's entries from list and single view in the app
     Given I entered the data activity "Web links" on course "Course 1" as "student1" in the app

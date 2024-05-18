@@ -1,4 +1,4 @@
-@mod @mod_lesson @app @javascript
+@addon_mod_lesson @app @javascript
 Feature: Test decimal separators in lesson
 
   Background:
@@ -78,7 +78,6 @@ Feature: Test decimal separators in lesson
     Then I should find "Congratulations - end of lesson reached" in the app
     And I should find "Your score is 1 (out of 1)." in the app
 
-  @lms_from4.0
   Scenario: Attempt an online lesson successfully as a student (custom separator) and review as teacher
     Given the following "language customisations" exist:
       | component       | stringid | value |
@@ -117,6 +116,14 @@ Feature: Test decimal separators in lesson
 
     When I press "Review lesson" in the app
     Then the field "Your answer" matches value "2,87" in the app
+    And the following events should have been logged for "student1" in the app:
+      | name                                   | activity | activityname | object       | objectname            | course   |
+      | \mod_lesson\event\course_module_viewed | lesson   | Basic lesson |              |                       | Course 1 |
+      | \mod_lesson\event\lesson_started       | lesson   | Basic lesson |              |                       | Course 1 |
+      | \mod_lesson\event\lesson_ended         | lesson   | Basic lesson |              |                       | Course 1 |
+      | \mod_lesson\event\question_viewed      | lesson   | Basic lesson | lesson_pages | Hardest question ever | Course 1 |
+      | \mod_lesson\event\question_answered    | lesson   | Basic lesson | lesson_pages | Hardest question ever | Course 1 |
+      | \core\event\user_graded                |          |              |              |                       | Course 1 |
 
   Scenario: Attempt an offline lesson successfully as a student (standard separator)
     Given I entered the course "Course 1" as "student1" in the app

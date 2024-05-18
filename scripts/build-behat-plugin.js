@@ -14,14 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const minimatch = require('minimatch');
+const { minimatch } = require('minimatch');
 const { existsSync, readFileSync, writeFileSync, statSync, renameSync, rmSync } = require('fs');
 const { readdir } = require('fs').promises;
 const { mkdirSync, copySync } = require('fs-extra');
 const { resolve, extname, dirname, basename, relative } = require('path');
 
 async function main() {
-    const pluginPath = process.argv[2] || guessPluginPath() || fail('Folder argument missing!');
+    const pluginPath = process.argv[2]
+        || guessPluginPath()
+        || fail('Folder argument missing! (you can also set the MOODLE_APP_BEHAT_PLUGIN_PATH env variable)');
     const excludeFeatures = process.argv.some(arg => arg === '--exclude-features');
     const exclusions = excludeFeatures
         ? [

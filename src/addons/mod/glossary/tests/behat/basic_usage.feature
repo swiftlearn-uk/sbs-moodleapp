@@ -1,4 +1,4 @@
-@mod @mod_glossary @app @javascript
+@addon_mod_glossary @app @javascript
 Feature: Test basic usage of glossary in app
   In order to participate in the glossaries while using the mobile app
   As a student
@@ -45,6 +45,10 @@ Feature: Test basic usage of glossary in app
     When I press "Potato" in the app
     Then I should find "Potato" in the app
     And I should find "To make chips" in the app
+    And the following events should have been logged for "student1" in the app:
+      | name                                     | activity | activityname  | object           | objectname | course   |
+      | \mod_glossary\event\course_module_viewed | glossary | Test glossary |                  |            | Course 1 |
+      | \mod_glossary\event\entry_viewed         | glossary | Test glossary | glossary_entries | Potato     | Course 1 |
 
   Scenario: Navigate to glossary terms by link (auto-linking)
     Given the "glossary" filter is "on"
@@ -154,7 +158,6 @@ Feature: Test basic usage of glossary in app
     Then I should find "Garlic" in the app
     And I should find "Allium sativum" in the app
 
-  @lms_from3.10
   Scenario: Edit entries
     Given I entered the glossary activity "Test glossary" on course "Course 1" as "student1" in the app
 
@@ -271,7 +274,6 @@ Feature: Test basic usage of glossary in app
     But I should not find "stub2.txt" in the app
     And I should not find "Brassica oleracea var. italica" in the app
 
-  @lms_from3.10
   Scenario: Delete entries
     Given I entered the glossary activity "Test glossary" on course "Course 1" as "student1" in the app
 

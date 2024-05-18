@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SystemUI } from '../src/ts/plugins/SystemUI';
+import { InstallReferrer } from '../src/ts/plugins/InstallReferrer';
+import { SecureStorage as SecureStorageImpl } from '../src/ts/plugins/SecureStorage';
+import { Diagnostic } from '../src/ts/plugins/Diagnostic';
 
 declare global {
 
     interface MoodleAppPlugins {
-        systemUI: SystemUI;
+        secureStorage: SecureStorageImpl;
+        installReferrer: InstallReferrer;
+        diagnostic: Diagnostic;
     }
 
     interface Cordova {
@@ -25,3 +29,5 @@ declare global {
     }
 
 }
+
+export type SecureStorage = InstanceType<typeof SecureStorageImpl>;
